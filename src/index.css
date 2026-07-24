@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body { @apply bg-gray-50 text-gray-900 font-sans antialiased; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-gray-300 rounded-full; }
+}
+
+@layer components {
+  /* Status colours */
+  .status-occupied         { @apply bg-[#1a7a4a] border-[#0d3d22] text-white; }
+  .status-vacant           { @apply bg-white border-[#a7d7bc] text-gray-400; }
+  .status-checkout         { @apply bg-[#1d4ed8] border-[#1e3a8a] text-white; }
+  .status-invalid-checkout { @apply bg-[#dc2626] border-[#7f1d1d] text-white; }
+  .status-extended         { @apply bg-[#d97706] border-[#92400e] text-white; }
+  .status-extended-alt     { @apply bg-[#15803d] border-[#14532d] text-white; }
+  .status-maintenance      { @apply bg-[#374151] border-[#1c2128] text-white; }
+  .status-paid-today       { @apply bg-[#60a5fa] border-[#2563eb] text-white; }
+
+  /* Source badge colours */
+  .src-T  { @apply bg-blue-100 text-blue-700; }
+  .src-W  { @apply bg-gray-100 text-gray-600; }
+  .src-B  { @apply bg-indigo-100 text-indigo-700; }
+  .src-AG { @apply bg-red-100 text-red-700; }
+  .src-EX { @apply bg-amber-100 text-amber-700; }
+}
+
+/* Month-view table */
+.mv-table { border-collapse: collapse; }
+.mv-table th, .mv-table td { border: 1px solid #e5e7eb; }

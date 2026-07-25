@@ -4,7 +4,8 @@ import { useToast } from '../components/Toast'
 import {
   fmtDate, parseDate, sortRoomKeys, groupByFloor,
   getRoomStatus, STATUS_CLASSES, SRC_BADGE_CLASSES,
-  srcShort, peso, isInRangeInclusive
+  srcShort, peso, isInRangeInclusive,
+  bookingTotalDue, bookingAmountPaid
 } from '../lib/utils'
 import { updateBookingField } from '../lib/db'
 import RoomModal from './RoomModal'
@@ -52,19 +53,27 @@ export default function Dashboard({ currentDate, onAddBooking }) {
   const getRoomObj = (num) => rooms.find(r => r.number === num)
 
   const stats = useMemo(() => {
-    let occ = 0, vac = 0, maint = 0, noDeposit = 0
+    let occ = 0, vac = 0, maint = 0, noDeposit = 0, totalOwed = 0
     rooms.forEach(r => {
       const b = getBookingOnDate(r.number)
       const s = getRoomStatus(r, b, currentDate, todayStr)
       const isOcc = ['occupied','checkout','invalid-checkout','extended','extended-alt'].includes(s)
-      if (isOcc) { occ++; if (!b?.key_deposit) noDeposit++ }
+      if (isOcc) {
+        occ++
+        if (!b?.key_deposit) noDeposit++
+        if (b) {
+          const due  = bookingTotalDue({ ...b, room_type: r.type }, prices, addons)
+          const paid = bookingAmountPaid(b)
+          totalOwed += Math.max(0, due - paid)
+        }
+      }
       else if (s === 'vacant') vac++
       else maint++
     })
     const pct = rooms.length ? Math.round(occ / rooms.length * 100) : 0
-    return { occ, vac, maint, noDeposit, pct, total: rooms.length }
+    return { occ, vac, maint, noDeposit, pct, total: rooms.length, totalOwed }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rooms, bookings, todayStr])
+  }, [rooms, bookings, prices, addons, todayStr])
 
   const floorMap = useMemo(() => groupByFloor(rooms.map(r => r.number)), [rooms])
 
@@ -96,16 +105,17 @@ export default function Dashboard({ currentDate, onAddBooking }) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Stats row */}
-      <div className="grid grid-cols-4 gap-3 px-5 pt-4 pb-3">
+      <div className="grid grid-cols-5 gap-3 px-5 pt-4 pb-3">
         {[
-          { label: 'Occupancy', val: stats.pct + '%', sub: `${stats.occ} of ${stats.total} rooms`, color: '' },
-          { label: 'Occupied',  val: stats.occ,       sub: '',               color: 'text-blue-600' },
-          { label: 'Vacant',    val: stats.vac,       sub: '',               color: 'text-brand' },
-          { label: 'No key deposit', val: stats.noDeposit, sub: `of ${stats.occ} occupied`, color: 'text-red-500' },
+          { label: 'Occupancy',        val: stats.pct + '%',      sub: `${stats.occ} of ${stats.total} rooms`, color: '' },
+          { label: 'Occupied',         val: stats.occ,            sub: '',                                     color: 'text-blue-600' },
+          { label: 'Vacant',           val: stats.vac,            sub: '',                                     color: 'text-brand' },
+          { label: 'No key deposit',   val: stats.noDeposit,      sub: `of ${stats.occ} occupied`,             color: 'text-red-500' },
+          { label: 'Outstanding',      val: peso(stats.totalOwed), sub: 'balance owed',                        color: stats.totalOwed > 0 ? 'text-amber-600' : 'text-brand' },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3">
             <div className="text-[11px] text-gray-500 font-medium">{s.label}</div>
-            <div className={`text-2xl font-extrabold mt-0.5 ${s.color}`}>{s.val}</div>
+            <div className={`text-xl font-extrabold mt-0.5 ${s.color}`}>{s.val}</div>
             {s.sub && <div className="text-[11px] text-gray-400 mt-0.5">{s.sub}</div>}
           </div>
         ))}

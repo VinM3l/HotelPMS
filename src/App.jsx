@@ -105,6 +105,7 @@ function Shell() {
               <MonthView
                 currentDate={currentDate}
                 onRoomClick={(num) => setOpenRoom(num)}
+                onAddBooking={(num) => setAddBooking(num)}
               />
             )}
           </div>

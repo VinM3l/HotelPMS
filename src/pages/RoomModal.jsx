@@ -86,6 +86,7 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
   }
 
   const markInvalidCheckout = async (b) => {
+    if (!confirm(`Mark ${b.guest} as invalid checkout? This will flag the room in red.`)) return
     await updateBookingField(b.id, {
       invalid_checkout: true,
       invalid_checkout_date: todayStr,

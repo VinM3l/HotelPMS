@@ -34,7 +34,7 @@ function getCellStatus(booking, ds) {
   return 'occupied'
 }
 
-export default function MonthView({ currentDate, onRoomClick }) {
+export default function MonthView({ currentDate, onRoomClick, onAddBooking }) {
   const { rooms, bookings } = useData()
   const [year, setYear]   = useState(currentDate.getFullYear())
   const [month, setMonth] = useState(currentDate.getMonth())
@@ -154,8 +154,10 @@ export default function MonthView({ currentDate, onRoomClick }) {
                       <td key={d}
                         className={`border border-gray-100 p-0 cursor-pointer hover:opacity-80 transition-opacity
                           ${cellCls} ${isToday ? 'ring-2 ring-inset ring-white/50' : ''}`}
-                        title={booking ? `${booking.guest} · ${srcLabel(booking.source)} · ${shortDate(booking.checkin)}–${shortDate(booking.checkout)}` : ''}
-                        onClick={() => booking && onRoomClick?.(num)}
+                        title={booking
+                          ? `${booking.guest} · ${srcLabel(booking.source)} · ${shortDate(booking.checkin)}–${shortDate(booking.checkout)}`
+                          : `Add booking for Room ${num}`}
+                        onClick={() => booking ? onRoomClick?.(num) : onAddBooking?.(num)}
                       >
                         <div className="w-full h-7 px-0.5 flex items-center overflow-hidden relative">
                           {isCI  && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/60 rounded-r" />}

@@ -10,14 +10,14 @@ import { upsertBooking } from '../lib/db'
 
 const SOURCES = ['W','T','B','AG','EX']
 
-export default function BookingModal({ bookingId, preRoom, currentDate, onClose }) {
+export default function BookingModal({ bookingId, preRoom, currentDate, onClose, defaultHotelId }) {
   const { rooms, bookings, prices, addons, reload } = useData()
   const { toast } = useToast()
 
   const existing = bookings.find(b => b.id === bookingId) || null
 
   const [guest,        setGuest]        = useState(existing?.guest        || '')
-  const [hotelId,      setHotelId]      = useState(existing?.hotel_id     || rooms[0]?.hotel_id || 'square')
+  const [hotelId,      setHotelId]      = useState(existing?.hotel_id     || defaultHotelId || rooms[0]?.hotel_id || 'square')
   const [room,         setRoom]         = useState(existing?.room_number  || preRoom || '')
   const [checkin,      setCheckin]      = useState(existing?.checkin      || fmtDate(currentDate))
   const [checkout,     setCheckout]     = useState(existing?.checkout     || fmtDate(currentDate))

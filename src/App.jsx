@@ -22,6 +22,13 @@ function Shell() {
   const [addBooking,  setAddBooking] = useState(null)  // null | roomNumber | true
   const [openRoom,    setOpenRoom]   = useState(null)  // room number
 
+  const switchHotel = (h) => {
+    setHotel(h)
+    setPage('dashboard')
+    setOpenRoom(null)
+    setAddBooking(null)
+  }
+
   if (!user) return <LoginPage />
 
   const changeDay = (d) => {
@@ -57,7 +64,7 @@ function Shell() {
           currentPage={page}
           onPage={navigate}
           currentHotel={hotel}
-          onHotel={h => { setHotel(h) }}
+          onHotel={switchHotel}
           currentDate={currentDate}
         />
 
@@ -109,6 +116,7 @@ function Shell() {
         <BookingModal
           preRoom={typeof addBooking === 'string' ? addBooking : undefined}
           currentDate={currentDate}
+          defaultHotelId={hotel}
           onClose={() => setAddBooking(null)}
         />
       )}

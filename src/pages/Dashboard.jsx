@@ -37,11 +37,17 @@ export default function Dashboard({ currentDate, onAddBooking }) {
 
   const todayStr = fmtDate(currentDate)
 
-  const getBookingOnDate = (roomNumber) =>
-    bookings.find(b =>
-      b.room_number === roomNumber &&
-      isInRangeInclusive(currentDate, b.checkin, b.checkout)
-    ) || null
+  const bookingMap = useMemo(() => {
+    const map = {}
+    bookings.forEach(b => {
+      if (isInRangeInclusive(currentDate, b.checkin, b.checkout)) {
+        if (!map[b.room_number]) map[b.room_number] = b
+      }
+    })
+    return map
+  }, [bookings, todayStr])
+
+  const getBookingOnDate = (roomNumber) => bookingMap[roomNumber] || null
 
   const getRoomObj = (num) => rooms.find(r => r.number === num)
 

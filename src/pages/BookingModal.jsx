@@ -22,7 +22,7 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
   const [checkin,      setCheckin]      = useState(existing?.checkin      || fmtDate(currentDate))
   const [checkout,     setCheckout]     = useState(existing?.checkout     || fmtDate(currentDate))
   const [ciTime,       setCiTime]       = useState(existing?.checkin_time_str  || '14:00')
-  const [coTime,       setCoTime]       = useState(existing?.checkout_time_str || '12:00')
+  const [coTime,       setCoTime]       = useState(existing?.checkout_time_str || '23:59')
   const [source,       setSource]       = useState(existing?.source       || 'W')
   const [extraHead,    setExtraHead]    = useState(existing?.extra_head   || 0)
   const [extraBed,     setExtraBed]     = useState(existing?.extra_bed    || 0)
@@ -154,11 +154,16 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Check-out</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+              Check-out {!existing && <span className="text-gray-400 normal-case font-normal">(defaults to 11:59 PM)</span>}
+            </label>
             <div className="flex gap-2">
               <input className={`${inputClass} flex-1`} type="date" value={checkout} onChange={e => setCheckout(e.target.value)} />
-              <input className="w-24 border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30"
-                type="time" value={coTime} onChange={e => setCoTime(e.target.value)} />
+              {/* Only show checkout time when editing an existing booking */}
+              {existing && (
+                <input className="w-24 border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30"
+                  type="time" value={coTime} onChange={e => setCoTime(e.target.value)} />
+              )}
             </div>
           </div>
         </div>
@@ -241,10 +246,20 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
             <textarea className={inputClass} rows={2} value={notes} onChange={e => setNotes(e.target.value)}
               placeholder="Any special notes…" />
           </div>
-          <div className="flex items-center gap-2 pt-5">
-            <input type="checkbox" id="deposit-check" checked={keyDeposit} onChange={e => setKeyDeposit(e.target.checked)}
-              className="w-4 h-4 rounded accent-brand" />
-            <label htmlFor="deposit-check" className="text-sm text-gray-700">🔑 Key deposit paid</label>
+          <div className="flex flex-col justify-end">
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Key Deposit</label>
+            <button
+              type="button"
+              onClick={() => setKeyDeposit(v => !v)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 font-semibold text-sm transition-all ${
+                keyDeposit
+                  ? 'bg-brand border-brand text-white shadow-md'
+                  : 'bg-white border-gray-200 text-gray-500 hover:border-brand/40'
+              }`}
+            >
+              <span className="text-xl">🔑</span>
+              <span>{keyDeposit ? 'Deposit paid ✓' : 'Mark deposit paid'}</span>
+            </button>
           </div>
         </div>
 

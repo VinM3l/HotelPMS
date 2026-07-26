@@ -25,6 +25,7 @@ export default function BookingsPage({ currentDate }) {
   const [search,     setSearch]     = useState('')
   const [dateFilter, setDateFilter] = useState('current')
   const [editId,     setEditId]     = useState(null)
+  const [sortBy,     setSortBy]     = useState('checkin')
 
   const todayStr = fmtDate(currentDate)
 
@@ -45,7 +46,12 @@ export default function BookingsPage({ currentDate }) {
         }
         return true
       })
-      .sort((a, b) => b.checkin.localeCompare(a.checkin))
+      .sort((a, b) => {
+        if (sortBy === 'room')    return a.room_number.localeCompare(b.room_number)
+        if (sortBy === 'guest')   return a.guest.localeCompare(b.guest)
+        if (sortBy === 'checkout') return a.checkout.localeCompare(b.checkout)
+        return b.checkin.localeCompare(a.checkin) // default: checkin desc
+      })
   }, [bookings, search, dateFilter, todayStr, rooms, prices, addons])
 
   // Total balance owed across filtered bookings
@@ -91,6 +97,13 @@ export default function BookingsPage({ currentDate }) {
               }`}>{f.label}</button>
           ))}
         </div>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value)}
+          className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/30 ml-auto">
+          <option value="checkin">Sort: Check-in ↓</option>
+          <option value="checkout">Sort: Check-out</option>
+          <option value="room">Sort: Room no.</option>
+          <option value="guest">Sort: Guest name</option>
+        </select>
       </div>
 
       {/* Summary bar */}

@@ -326,12 +326,12 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
                     </div>
                   )}
 
-                  <button onClick={() => setExtendId(b.id)}
+                  <button onClick={() => { setExtendId(b.id); setNewCheckout('') }}
                     className="text-xs py-2 px-3 rounded-lg bg-amber-50 text-amber-700 font-medium hover:bg-amber-100">
                     ⟳ Extend stay
                   </button>
 
-                  <button onClick={() => { setMoveId(b.id); setMoveTarget('') }}
+                  <button onClick={() => { setMoveId(b.id); setMoveTarget(''); setMoveNote('') }}
                     className="text-xs py-2 px-3 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100">
                     ↔ Move room
                   </button>
@@ -508,7 +508,7 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
     {/* Extend stay modal */}
     {extendId && extendBooking && (
       <Modal open onClose={() => setExtendId(null)} title="⟳ Extend Stay"
-        subtitle={`${extendBooking.guest} · Room ${roomNumber}`} maxWidth="max-w-sm" zIndex="z-60"
+        subtitle={`${extendBooking.guest} · Room ${roomNumber}`} maxWidth="max-w-sm" zIndex="z-[60]"
         footer={<>
           <button onClick={() => setExtendId(null)} className="px-4 py-2 text-sm text-gray-500">Cancel</button>
           <button onClick={confirmExtend} className="px-4 py-2 text-sm bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600">Confirm</button>
@@ -522,7 +522,11 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1.5">New checkout date</label>
             <input type="date" value={newCheckout} onChange={e => setNewCheckout(e.target.value)}
-              min={(() => { const d = new Date(extendBooking.checkout + 'T00:00:00'); d.setDate(d.getDate() + 1); return d.toISOString().slice(0,10) })()}
+              min={(() => {
+                const [y, m, d] = extendBooking.checkout.split('-').map(Number)
+                const next = new Date(y, m - 1, d + 1)
+                return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`
+              })()}
               className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30" />
           </div>
         </div>
@@ -532,7 +536,7 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
     {/* Move room modal */}
     {moveId && moveBooking && (
       <Modal open onClose={() => setMoveId(null)} title="↔ Move Guest"
-        subtitle={`${moveBooking.guest} currently in Room ${moveBooking.room_number}`} maxWidth="max-w-sm" zIndex="z-60"
+        subtitle={`${moveBooking.guest} currently in Room ${moveBooking.room_number}`} maxWidth="max-w-sm" zIndex="z-[60]"
         footer={<>
           <button onClick={() => setMoveId(null)} className="px-4 py-2 text-sm text-gray-500">Cancel</button>
           <button onClick={confirmMove} className="px-4 py-2 text-sm bg-brand text-white rounded-lg font-medium hover:bg-brand-dark">Move</button>

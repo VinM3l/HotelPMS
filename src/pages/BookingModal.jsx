@@ -17,6 +17,7 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
   const existing = bookings.find(b => b.id === bookingId) || null
 
   const [guest,        setGuest]        = useState(existing?.guest        || '')
+  const [guestPhone,   setGuestPhone]   = useState(existing?.guest_phone  || '')
   const [hotelId,      setHotelId]      = useState(existing?.hotel_id     || defaultHotelId || rooms[0]?.hotel_id || 'square')
   const [room,         setRoom]         = useState(existing?.room_number  || preRoom || '')
   const [checkin,      setCheckin]      = useState(existing?.checkin      || fmtDate(currentDate))
@@ -60,6 +61,7 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
       hotel_id:         hotelId,
       room_number:      room,
       guest:            guest.trim(),
+      guest_phone:      guestPhone.trim(),
       source,
       checkin,
       checkout,
@@ -107,35 +109,44 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
       </>}
     >
       <div className="space-y-4">
-        {/* Guest name */}
-        <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Guest name</label>
-          <input className={inputClass} type="text" placeholder="Full name" value={guest}
-            onChange={e => setGuest(e.target.value)} autoFocus />
+        {/* Guest name + phone */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Guest name</label>
+            <input className={inputClass} type="text" placeholder="Full name" value={guest}
+              onChange={e => setGuest(e.target.value)} autoFocus />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Phone number</label>
+            <input className={inputClass} type="tel" placeholder="09xx xxx xxxx" value={guestPhone}
+              onChange={e => setGuestPhone(e.target.value)} />
+          </div>
         </div>
 
         {/* Hotel + Room */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Hotel</label>
-            <select className={inputClass} value={hotelId} onChange={e => setHotelId(e.target.value)}>
-              <option value="square">Square Hotel</option>
-              <option value="pool">Pool Hotel</option>
-            </select>
+            <div className={`${inputClass} bg-gray-50 text-gray-600`}>
+              {hotelId === 'pool' ? 'Pool Hotel' : 'Square Hotel'}
+            </div>
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Room</label>
             <select className={inputClass} value={room} onChange={e => setRoom(e.target.value)}>
               <option value="">Select…</option>
-              {sortRoomKeys(rooms.filter(r => r.hotel_id === hotelId).map(r => r.number)).map(n => {
+              {sortRoomKeys(
+                rooms.filter(r => r.hotel_id === hotelId && (r.status !== 'maintenance' || r.number === existing?.room_number)).map(r => r.number)
+              ).map(n => {
                 const isConflict = checkin && checkout && n !== existing?.room_number && bookings.find(b =>
                   b.hotel_id === hotelId && b.room_number === n && b.id !== bookingId &&
                   bookingsOverlap(b.checkin, b.checkout, checkin, checkout, b.checkout_time_str || '12:00', ciTime)
                 )
                 const r = rooms.find(x => x.number === n)
+                const isMaint = r?.status === 'maintenance'
                 return (
-                  <option key={n} value={n} style={isConflict ? { color: '#dc2626' } : {}}>
-                    {n} – {r?.label}{isConflict ? ' ⚠️ Taken' : ''}
+                  <option key={n} value={n} style={(isConflict || isMaint) ? { color: '#dc2626' } : {}}>
+                    {n} – {r?.label}{isConflict ? ' ⚠️ Taken' : ''}{isMaint ? ' 🔧 Under maintenance' : ''}
                   </option>
                 )
               })}

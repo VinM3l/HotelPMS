@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
 import { updatePrice, updateAddon } from '../lib/db'
@@ -21,6 +21,14 @@ const TYPES = [
 export default function PricesPage() {
   const { prices, addons, reload } = useData()
   const { toast } = useToast()
+
+  // Local editable copies, kept in sync with context so external updates
+  // (reload after save, another tab/teammate editing) don't leave stale values on screen.
+  const [priceDraft, setPriceDraft] = useState(prices || {})
+  const [addonDraft, setAddonDraft] = useState(addons || {})
+
+  useEffect(() => { setPriceDraft(prices || {}) }, [prices])
+  useEffect(() => { setAddonDraft(addons || {}) }, [addons])
 
   const savePrice = async (type, src, val) => {
     await updatePrice(type, src, parseFloat(val) || 0)
@@ -56,16 +64,20 @@ export default function PricesPage() {
               {TYPES.map((type, ri) => (
                 <tr key={type.id} className={ri % 2 === 1 ? 'bg-gray-50/50' : ''}>
                   <td className="px-4 py-3 font-medium text-gray-700">{type.label}</td>
-                  {SOURCES.map(src => (
-                    <td key={src.id} className="px-3 py-3 text-center">
-                      <input
-                        type="number"
-                        defaultValue={prices[`${type.id}_${src.id}`] || 0}
-                        onBlur={e => savePrice(type.id, src.id, e.target.value)}
-                        className={inputClass}
-                      />
-                    </td>
-                  ))}
+                  {SOURCES.map(src => {
+                    const key = `${type.id}_${src.id}`
+                    return (
+                      <td key={src.id} className="px-3 py-3 text-center">
+                        <input
+                          type="number"
+                          value={priceDraft[key] ?? 0}
+                          onChange={e => setPriceDraft(d => ({ ...d, [key]: e.target.value }))}
+                          onBlur={e => savePrice(type.id, src.id, e.target.value)}
+                          className={inputClass}
+                        />
+                      </td>
+                    )
+                  })}
                 </tr>
               ))}
             </tbody>
@@ -87,11 +99,12 @@ export default function PricesPage() {
               <span className="text-sm text-gray-600 w-56">{label}</span>
               <input
                 type="number"
-                defaultValue={addons?.[id] || 0}
+                value={addonDraft[id] ?? 0}
+                onChange={e => setAddonDraft(d => ({ ...d, [id]: e.target.value }))}
                 onBlur={e => saveAddon(id, e.target.value)}
                 className={inputClass}
               />
-              <span className="text-xs text-gray-400">{peso(addons?.[id] || 0)}/night</span>
+              <span className="text-xs text-gray-400">{peso(addonDraft[id] || 0)}/night</span>
             </div>
           ))}
         </div>

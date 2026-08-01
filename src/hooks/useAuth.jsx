@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
-// Accounts are stored here. In production you could move these to Supabase auth.
-const ACCOUNTS = {
-  admin: { password: 'admin123', role: 'admin', label: 'Administrator' },
-  staff: { password: 'staff123', role: 'user',  label: 'Front Desk' },
-}
+// Real accounts now live in Supabase Auth (see supabase_auth_setup.sql for setup steps).
+// Login usernames map to internal emails so the existing "username" UI doesn't need to change.
+const emailFor = (username) => `${username.toLowerCase()}@hotelpms.local`
 
 export const ROLE_PAGES = {
   admin: ['dashboard', 'rooms', 'bookings', 'prices', 'analytics', 'monthview'],
@@ -13,31 +12,49 @@ export const ROLE_PAGES = {
 
 const AuthContext = createContext(null)
 
+async function loadProfile(authUser) {
+  if (!authUser) return null
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select('role, label')
+    .eq('id', authUser.id)
+    .single()
+  if (error || !data) return null
+  return { username: authUser.email.split('@')[0], role: data.role, label: data.label }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    try {
-      const s = sessionStorage.getItem('hotel_pms_session')
-      if (s) setUser(JSON.parse(s))
-    } catch {}
-    setLoading(false)
+    let active = true
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const profile = await loadProfile(session?.user)
+      if (active) { setUser(profile); setLoading(false) }
+    })
+
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const profile = await loadProfile(session?.user)
+      if (active) setUser(profile)
+    })
+
+    return () => { active = false; sub.subscription.unsubscribe() }
   }, [])
 
-  const login = (username, password) => {
-    const account = ACCOUNTS[username.toLowerCase()]
-    if (!account || account.password !== password) return false
-    const u = { username: username.toLowerCase(), role: account.role, label: account.label }
-    setUser(u)
-    try { sessionStorage.setItem('hotel_pms_session', JSON.stringify(u)) } catch {}
+  const login = async (username, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: emailFor(username), password,
+    })
+    if (error || !data.user) return false
+    const profile = await loadProfile(data.user)
+    if (!profile) { await supabase.auth.signOut(); return false }
+    setUser(profile)
     return true
   }
 
-  const logout = () => {
-    setUser(null)
-    try { sessionStorage.removeItem('hotel_pms_session') } catch {}
-  }
+  const logout = () => { supabase.auth.signOut() }
 
   const isAdmin = () => user?.role === 'admin'
   const canAccess = (page) => ROLE_PAGES[user?.role]?.includes(page) ?? false

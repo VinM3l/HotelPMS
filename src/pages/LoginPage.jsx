@@ -6,10 +6,15 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const submit = () => {
+  const submit = async () => {
+    if (submitting) return
     setError('')
-    if (!login(username.trim(), password)) {
+    setSubmitting(true)
+    const ok = await login(username.trim(), password)
+    setSubmitting(false)
+    if (!ok) {
       setError('Incorrect username or password.')
       setPassword('')
     }
@@ -56,9 +61,10 @@ export default function LoginPage() {
             {error && <p className="text-xs text-red-600">{error}</p>}
             <button
               onClick={submit}
-              className="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-2.5 rounded-lg transition-colors text-sm mt-2"
+              disabled={submitting}
+              className="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-2.5 rounded-lg transition-colors text-sm mt-2 disabled:opacity-60"
             >
-              Sign in
+              {submitting ? 'Signing in…' : 'Sign in'}
             </button>
           </div>
         </div>

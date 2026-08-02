@@ -62,6 +62,7 @@ create table if not exists bookings (
   hotel_id          text references hotels(id),
   room_number       text not null,
   guest             text not null,
+  guest_phone       text,
   source            text not null default 'W',
   checkin           date not null,
   checkout          date not null,

@@ -50,7 +50,7 @@ function PageContent({ page, hotel, currentDate, setAddBooking, setOpenRoom }) {
 }
 
 function Shell() {
-  const { user, canAccess } = useAuth()
+  const { user, loading, canAccess } = useAuth()
   const [page,        setPage]    = useState('dashboard')
   const [hotel,       setHotel]   = useState('square')
   const [sidebarOpen, setSidebar] = useState(true)
@@ -63,6 +63,7 @@ function Shell() {
   const goToday     = () => { const d = new Date(); d.setHours(0,0,0,0); setDate(d) }
   const navigate    = (p) => { if (!canAccess(p)) return; setPage(p) }
 
+  if (loading) return <LoadingScreen message="Loading…" />
   if (!user) return <LoginPage />
 
   const PAGE_TITLES = {

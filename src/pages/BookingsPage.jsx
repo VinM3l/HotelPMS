@@ -33,7 +33,7 @@ export default function BookingsPage({ currentDate }) {
     const q = search.toLowerCase()
     return [...bookings]
       .filter(b => {
-        if (q && !b.guest.toLowerCase().includes(q) && !b.room_number.includes(q)) return false
+        if (q && !b.guest.toLowerCase().includes(q) && !b.room_number.includes(q) && !(b.guest_phone || '').includes(q)) return false
         if (dateFilter === 'current')  return b.checkin <= todayStr && b.checkout >= todayStr
         if (dateFilter === 'today')    return b.checkin === todayStr || b.checkout === todayStr
         if (dateFilter === 'upcoming') return b.checkin > todayStr
@@ -85,7 +85,7 @@ export default function BookingsPage({ currentDate }) {
         <div className="relative flex-1 max-w-xs">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
           <input className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand/30"
-            placeholder="Search by guest or room…" value={search} onChange={e => setSearch(e.target.value)} />
+            placeholder="Search by guest, room, or phone…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <div className="flex gap-1.5 flex-wrap">
           {DATE_FILTERS.map(f => (
@@ -155,6 +155,7 @@ export default function BookingsPage({ currentDate }) {
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5">
                   Room {b.room_number} · {shortDate(b.checkin)} – {shortDate(b.checkout)} · {nights} night{nights !== 1 ? 's' : ''}
+                  {b.guest_phone && <> · <a href={`tel:${b.guest_phone}`} className="text-brand hover:underline" onClick={e => e.stopPropagation()}>📞 {b.guest_phone}</a></>}
                 </div>
               </div>
               <div className="text-right flex-shrink-0">

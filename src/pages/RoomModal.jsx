@@ -233,6 +233,11 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div>
                     <div className="font-bold text-gray-900 text-base">{b.guest}</div>
+                    {b.guest_phone && (
+                      <a href={`tel:${b.guest_phone}`} className="text-xs text-brand font-medium hover:underline">
+                        📞 {b.guest_phone}
+                      </a>
+                    )}
                     <div className="text-xs text-gray-500 mt-0.5">
                       {shortDate(b.checkin)} – {shortDate(b.checkout)} · {nights} night{nights !== 1 ? 's' : ''}
                     </div>

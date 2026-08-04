@@ -14,7 +14,7 @@ import BookingModal from './BookingModal'
 export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooking }) {
   const { rooms, bookings, prices, addons, reload } = useData()
   const { toast } = useToast()
-  const { isAdmin } = useAuth()
+  const { isAdmin, user } = useAuth()
   const [tab, setTab] = useState('guest')
   const [calYear, setCalYear] = useState(currentDate.getFullYear())
   const [calMonth, setCalMonth] = useState(currentDate.getMonth())
@@ -64,13 +64,13 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
   }
 
   const markCheckedIn = async (b) => {
-    await updateBookingField(b.id, { checkin_time: nowTimestamp() })
+    await updateBookingField(b.id, { checkin_time: nowTimestamp(), checked_in_by: user?.label || user?.username || null })
     await reload()
     toast('✅ Check-in time recorded')
   }
 
   const clearCheckinTime = async (b) => {
-    await updateBookingField(b.id, { checkin_time: null })
+    await updateBookingField(b.id, { checkin_time: null, checked_in_by: null })
     await reload()
     toast('Check-in stamp cleared')
   }
@@ -80,6 +80,7 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
       checked_out: true,
       checked_out_date: todayStr,
       checkout_time: nowTimestamp(),
+      checked_out_by: user?.label || user?.username || null,
     })
     await reload()
     toast('🚪 Checked out')
@@ -102,6 +103,7 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
       invalid_checkout: false,
       invalid_checkout_date: null,
       checkout_time: null,
+      checked_out_by: null,
     })
     await reload()
     toast('↩ Checkout cleared')
@@ -309,6 +311,10 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
                   )}
                 </div>
 
+                {coActive && b.checked_out_by && (
+                  <div className="text-xs text-gray-400 mb-2">🚪 Checked out by {b.checked_out_by}{b.checkout_time ? ` · ${fmtTimestamp(b.checkout_time)}` : ''}</div>
+                )}
+
                 {/* Actions */}
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -326,7 +332,7 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
                   )}
                   {b.checkin_time && (
                     <div className="text-xs text-gray-400 py-2 px-3 flex items-center gap-1">
-                      ✅ {fmtTimestamp(b.checkin_time)}
+                      ✅ {fmtTimestamp(b.checkin_time)}{b.checked_in_by ? ` · ${b.checked_in_by}` : ''}
                       <button onClick={() => clearCheckinTime(b)} className="text-red-400 hover:text-red-600 ml-1">✕</button>
                     </div>
                   )}

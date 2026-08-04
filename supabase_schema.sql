@@ -77,6 +77,8 @@ create table if not exists bookings (
   notes             text not null default '',
   checked_out       boolean not null default false,
   checked_out_date  date,
+  checked_in_by     text,
+  checked_out_by    text,
   invalid_checkout  boolean not null default false,
   invalid_checkout_date date,
   checkin_time      timestamptz,

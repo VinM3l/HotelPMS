@@ -43,11 +43,7 @@ export async function fetchBookings(hotelId) {
 }
 
 export async function upsertBooking(booking) {
-  const { data, error } = await supabase
-    .from('bookings')
-    .upsert(booking)
-    .select()
-    .single()
+  const { data, error } = await supabase.from('bookings').upsert(booking).select().single()
   if (error) throw error
   return data
 }
@@ -68,14 +64,14 @@ export async function fetchPrices() {
   if (error) throw error
   // Convert to flat map: { 'standard_T': 1500, ... }
   const map = {}
-  data.forEach((p) => { map[`${p.room_type}_${p.source}`] = p.rate })
+  data.forEach((p) => {
+    map[`${p.room_type}_${p.source}`] = p.rate
+  })
   return map
 }
 
 export async function updatePrice(roomType, source, rate) {
-  const { error } = await supabase
-    .from('prices')
-    .upsert({ room_type: roomType, source, rate })
+  const { error } = await supabase.from('prices').upsert({ room_type: roomType, source, rate })
   if (error) throw error
 }
 
@@ -84,7 +80,9 @@ export async function fetchAddons() {
   const { data, error } = await supabase.from('addon_rates').select('*')
   if (error) throw error
   const map = {}
-  data.forEach((a) => { map[a.id] = a.rate })
+  data.forEach((a) => {
+    map[a.id] = a.rate
+  })
   return map
 }
 

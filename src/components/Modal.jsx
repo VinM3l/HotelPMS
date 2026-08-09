@@ -1,9 +1,20 @@
 import React, { useEffect } from 'react'
 
-export default function Modal({ open, onClose, title, subtitle, children, footer, maxWidth = 'max-w-lg', zIndex = 'z-50' }) {
+export default function Modal({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  footer,
+  maxWidth = 'max-w-lg',
+  zIndex = 'z-50',
+}) {
   useEffect(() => {
     if (!open) return
-    const esc = (e) => { if (e.key === 'Escape') onClose?.() }
+    const esc = (e) => {
+      if (e.key === 'Escape') onClose?.()
+    }
     document.addEventListener('keydown', esc)
     return () => document.removeEventListener('keydown', esc)
   }, [open, onClose])
@@ -13,10 +24,14 @@ export default function Modal({ open, onClose, title, subtitle, children, footer
   return (
     <div
       className={`fixed inset-0 bg-black/50 flex items-center justify-center p-4 ${zIndex}`}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose?.() }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose?.()
+      }}
     >
-      <div className={`bg-white rounded-2xl shadow-2xl w-full ${maxWidth} flex flex-col max-h-[90vh]`}
-           onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`bg-white rounded-2xl shadow-2xl w-full ${maxWidth} flex flex-col max-h-[90vh]`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-start justify-between px-6 py-4 border-b border-gray-100">
           <div>
@@ -26,13 +41,13 @@ export default function Modal({ open, onClose, title, subtitle, children, footer
           <button
             onClick={onClose}
             className="ml-4 text-gray-400 hover:text-gray-700 text-xl leading-none mt-0.5"
-          >×</button>
+          >
+            ×
+          </button>
         </div>
 
         {/* Body */}
-        <div className="overflow-y-auto flex-1 px-6 py-4">
-          {children}
-        </div>
+        <div className="overflow-y-auto flex-1 px-6 py-4">{children}</div>
 
         {/* Footer */}
         {footer && (

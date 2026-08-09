@@ -3,14 +3,21 @@ import { useAuth } from '../hooks/useAuth'
 
 const NAV = [
   { id: 'dashboard', icon: '📋', label: 'Dashboard' },
-  { id: 'rooms',     icon: '🚪', label: 'Rooms',     adminOnly: true },
-  { id: 'bookings',  icon: '📅', label: 'Bookings' },
-  { id: 'prices',    icon: '💰', label: 'Prices',    adminOnly: true },
+  { id: 'rooms', icon: '🚪', label: 'Rooms', adminOnly: true },
+  { id: 'bookings', icon: '📅', label: 'Bookings' },
+  { id: 'prices', icon: '💰', label: 'Prices', adminOnly: true },
   { id: 'analytics', icon: '📊', label: 'Analytics', adminOnly: true },
-  { id: 'monthview', icon: '🗓',  label: 'Month View' },
+  { id: 'monthview', icon: '🗓', label: 'Month View' },
 ]
 
-export default function Sidebar({ currentPage, onPage, currentHotel, onHotel, currentDate, onCollapse }) {
+export default function Sidebar({
+  currentPage,
+  onPage,
+  currentHotel,
+  onHotel,
+  currentDate,
+  onCollapse,
+}) {
   const { user, logout, isAdmin } = useAuth()
 
   return (
@@ -27,7 +34,9 @@ export default function Sidebar({ currentPage, onPage, currentHotel, onHotel, cu
           onClick={onCollapse}
           title="Collapse sidebar"
           className="text-gray-500 hover:text-white text-xl w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
-        >‹</button>
+        >
+          ‹
+        </button>
       </div>
 
       {/* Hotel switcher */}
@@ -35,15 +44,13 @@ export default function Sidebar({ currentPage, onPage, currentHotel, onHotel, cu
         <div className="flex gap-1.5">
           {[
             { id: 'square', icon: '🏨', label: 'Square' },
-            { id: 'pool',   icon: '🏊', label: 'Pool'   },
+            { id: 'pool', icon: '🏊', label: 'Pool' },
           ].map((h) => (
             <button
               key={h.id}
               onClick={() => onHotel(h.id)}
               className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-colors ${
-                currentHotel === h.id
-                  ? 'bg-brand text-white'
-                  : 'text-gray-400 hover:bg-white/10'
+                currentHotel === h.id ? 'bg-brand text-white' : 'text-gray-400 hover:bg-white/10'
               }`}
             >
               {h.icon} {h.label}
@@ -54,7 +61,9 @@ export default function Sidebar({ currentPage, onPage, currentHotel, onHotel, cu
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
-        <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest px-2 mb-2">Views</div>
+        <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest px-2 mb-2">
+          Views
+        </div>
         {NAV.map((item) => {
           if (item.adminOnly && !isAdmin()) return null
           const active = currentPage === item.id
@@ -84,11 +93,20 @@ export default function Sidebar({ currentPage, onPage, currentHotel, onHotel, cu
               {user?.role === 'admin' ? '🛡 Admin' : '👤 Staff'}
             </div>
           </div>
-          <button onClick={logout} title="Sign out"
-            className="text-gray-400 hover:text-white text-lg transition-colors">⏻</button>
+          <button
+            onClick={logout}
+            title="Sign out"
+            className="text-gray-400 hover:text-white text-lg transition-colors"
+          >
+            ⏻
+          </button>
         </div>
         <div className="text-[10px] text-gray-500">
-          {currentDate?.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}
+          {currentDate?.toLocaleDateString('en-PH', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          })}
         </div>
       </div>
     </aside>

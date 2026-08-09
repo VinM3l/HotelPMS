@@ -12,10 +12,17 @@ export const shortDate = (s) =>
   parseDate(s).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' })
 
 export const dateLabel = (d) =>
-  d.toLocaleDateString('en-PH', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+  d.toLocaleDateString('en-PH', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 
 export const sameDay = (a, b) =>
-  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate()
 
 export const isInRangeInclusive = (d, ci, co) => {
   const ds = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
@@ -41,10 +48,16 @@ export const genId = () => 'b' + Date.now() + Math.random().toString(36).slice(2
 export const nowTimestamp = () => {
   const d = new Date()
   return (
-    d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0') + 'T' +
-    String(d.getHours()).padStart(2, '0') + ':' +
-    String(d.getMinutes()).padStart(2, '0') + ':' +
+    d.getFullYear() +
+    '-' +
+    String(d.getMonth() + 1).padStart(2, '0') +
+    '-' +
+    String(d.getDate()).padStart(2, '0') +
+    'T' +
+    String(d.getHours()).padStart(2, '0') +
+    ':' +
+    String(d.getMinutes()).padStart(2, '0') +
+    ':' +
     String(d.getSeconds()).padStart(2, '0')
   )
 }
@@ -54,26 +67,30 @@ export const fmtTimestamp = (ts) => {
   const d = new Date(ts)
   return (
     d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) +
-    ' ' + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', hour12: true })
+    ' ' +
+    d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', hour12: true })
   )
 }
 
 // ── Labels ───────────────────────────────────────────────────────────────────
 export const srcLabel = (s) =>
-  ({ T: 'Trip.com', W: 'Walk-in', B: 'Booking.com', AG: 'Agoda', EX: 'Expedia' }[s] || s)
+  ({ T: 'Trip.com', W: 'Walk-in', B: 'Booking.com', AG: 'Agoda', EX: 'Expedia' })[s] || s
 
 export const srcShort = (s) =>
-  ({ T: 'Trip', W: 'Walk-in', B: 'Bkg', AG: 'Agoda', EX: 'Expedia' }[s] || s)
+  ({ T: 'Trip', W: 'Walk-in', B: 'Bkg', AG: 'Agoda', EX: 'Expedia' })[s] || s
 
 export const typeLabel = (t) =>
-  ({ standard: 'Standard Room', family2: 'Family Room (2 pax)', family3: 'Family Room (3 pax)' }[t] || t)
+  ({ standard: 'Standard Room', family2: 'Family Room (2 pax)', family3: 'Family Room (3 pax)' })[
+    t
+  ] || t
 
 export const peso = (n) => '₱' + Math.round(n).toLocaleString()
 
 // ── Room sorting ─────────────────────────────────────────────────────────────
 export const sortRoomKeys = (keys) =>
   [...keys].sort((a, b) => {
-    const an = /^\d+$/.test(a), bn = /^\d+$/.test(b)
+    const an = /^\d+$/.test(a),
+      bn = /^\d+$/.test(b)
     if (an && bn) return parseInt(a) - parseInt(b)
     if (an) return -1
     if (bn) return 1
@@ -87,8 +104,17 @@ export const groupByFloor = (roomNumbers) => {
     let label
     if (/^\d+$/.test(r)) {
       const f = Math.floor(parseInt(r) / 100) * 100
-      label = f === 100 ? 'Floor 1 (100s)' : f === 200 ? 'Floor 2 (200s)' : f === 300 ? 'Floor 3 (300s)' : `Floor (${f}s)`
-    } else { label = 'Extended Rooms' }
+      label =
+        f === 100
+          ? 'Floor 1 (100s)'
+          : f === 200
+            ? 'Floor 2 (200s)'
+            : f === 300
+              ? 'Floor 3 (300s)'
+              : `Floor (${f}s)`
+    } else {
+      label = 'Extended Rooms'
+    }
     if (!map[label]) map[label] = []
     map[label].push(r)
   })
@@ -141,12 +167,19 @@ export const getRoomStatus = (room, booking, date, todayStr) => {
   if (room.status === 'maintenance') return 'maintenance'
   if (!booking) return 'vacant'
   const ds = todayStr || fmtDate(date || new Date())
-  if (booking.invalid_checkout && (booking.invalid_checkout_date ? ds >= booking.invalid_checkout_date : true)) return 'invalid-checkout'
-  if (booking.checked_out && (booking.checked_out_date ? ds >= booking.checked_out_date : true)) return 'checkout'
+  if (
+    booking.invalid_checkout &&
+    (booking.invalid_checkout_date ? ds >= booking.invalid_checkout_date : true)
+  )
+    return 'invalid-checkout'
+  if (booking.checked_out && (booking.checked_out_date ? ds >= booking.checked_out_date : true))
+    return 'checkout'
   const exts = booking.extensions || []
   if (exts.length > 0) {
     const origCo = parseDate(exts[0].originalCheckout || booking.checkout)
-    const d0 = date ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : new Date(ds + 'T00:00:00')
+    const d0 = date
+      ? new Date(date.getFullYear(), date.getMonth(), date.getDate())
+      : new Date(ds + 'T00:00:00')
     if (d0 > origCo) {
       for (let ei = 0; ei < exts.length; ei++) {
         const prevEnd = ei === 0 ? origCo : parseDate(exts[ei - 1].checkout)
@@ -159,20 +192,20 @@ export const getRoomStatus = (room, booking, date, todayStr) => {
 }
 
 export const STATUS_CLASSES = {
-  occupied:          'bg-[#1a7a4a] border-[#0d3d22] text-white',
-  vacant:            'bg-white border-[#a7d7bc] text-gray-400',
-  checkout:          'bg-[#1d4ed8] border-[#1e3a8a] text-white',
-  'invalid-checkout':'bg-[#dc2626] border-[#7f1d1d] text-white',
-  extended:          'bg-[#d97706] border-[#92400e] text-white',
-  'extended-alt':    'bg-[#15803d] border-[#14532d] text-white',
-  maintenance:       'bg-[#374151] border-[#1c2128] text-white',
-  'paid-today':      'bg-[#60a5fa] border-[#2563eb] text-white',
+  occupied: 'bg-[#1a7a4a] border-[#0d3d22] text-white',
+  vacant: 'bg-white border-[#a7d7bc] text-gray-400',
+  checkout: 'bg-[#1d4ed8] border-[#1e3a8a] text-white',
+  'invalid-checkout': 'bg-[#dc2626] border-[#7f1d1d] text-white',
+  extended: 'bg-[#d97706] border-[#92400e] text-white',
+  'extended-alt': 'bg-[#15803d] border-[#14532d] text-white',
+  maintenance: 'bg-[#374151] border-[#1c2128] text-white',
+  'paid-today': 'bg-[#60a5fa] border-[#2563eb] text-white',
 }
 
 export const SRC_BADGE_CLASSES = {
-  T:  'bg-blue-100 text-blue-700',
-  W:  'bg-gray-100 text-gray-600',
-  B:  'bg-indigo-100 text-indigo-700',
+  T: 'bg-blue-100 text-blue-700',
+  W: 'bg-gray-100 text-gray-600',
+  B: 'bg-indigo-100 text-indigo-700',
   AG: 'bg-red-100 text-red-700',
   EX: 'bg-amber-100 text-amber-700',
 }

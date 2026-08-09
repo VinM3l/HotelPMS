@@ -7,7 +7,7 @@ const emailFor = (username) => `${username.toLowerCase()}@hotelpms.local`
 
 export const ROLE_PAGES = {
   admin: ['dashboard', 'rooms', 'bookings', 'prices', 'analytics', 'monthview'],
-  user:  ['dashboard', 'bookings', 'monthview'],
+  user: ['dashboard', 'bookings', 'monthview'],
 }
 
 const AuthContext = createContext(null)
@@ -32,7 +32,10 @@ export function AuthProvider({ children }) {
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       const profile = await loadProfile(session?.user)
-      if (active) { setUser(profile); setLoading(false) }
+      if (active) {
+        setUser(profile)
+        setLoading(false)
+      }
     })
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -40,21 +43,30 @@ export function AuthProvider({ children }) {
       if (active) setUser(profile)
     })
 
-    return () => { active = false; sub.subscription.unsubscribe() }
+    return () => {
+      active = false
+      sub.subscription.unsubscribe()
+    }
   }, [])
 
   const login = async (username, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: emailFor(username), password,
+      email: emailFor(username),
+      password,
     })
     if (error || !data.user) return false
     const profile = await loadProfile(data.user)
-    if (!profile) { await supabase.auth.signOut(); return false }
+    if (!profile) {
+      await supabase.auth.signOut()
+      return false
+    }
     setUser(profile)
     return true
   }
 
-  const logout = () => { supabase.auth.signOut() }
+  const logout = () => {
+    supabase.auth.signOut()
+  }
 
   const isAdmin = () => user?.role === 'admin'
   const canAccess = (page) => ROLE_PAGES[user?.role]?.includes(page) ?? false

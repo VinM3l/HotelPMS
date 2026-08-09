@@ -36,7 +36,9 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Username</label>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                Username
+              </label>
               <input
                 className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand"
                 type="text"
@@ -48,7 +50,9 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Password</label>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                Password
+              </label>
               <input
                 className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand"
                 type="password"

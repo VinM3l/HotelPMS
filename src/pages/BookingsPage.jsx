@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
 import { useAuth } from '../hooks/useAuth'
-import Badge from '../components/ui/Badge'
+import Badge from '../components/Badge'
 import {
   shortDate,
   peso,

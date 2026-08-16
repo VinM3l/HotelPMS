@@ -3,8 +3,8 @@ import Modal from '../components/Modal'
 import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
 import { useAuth } from '../hooks/useAuth'
-import Badge from '../components/ui/Badge'
-import ActionPill from '../components/ui/ActionPill'
+import Badge from '../components/Badge'
+import ActionPill from '../components/ActionPill'
 import {
   fmtDate,
   parseDate,

@@ -1,6 +1,6 @@
 import React from 'react'
-import { SRC_BADGE_CLASSES } from '../../lib/theme'
-import { srcLabel } from '../../lib/utils'
+import { SRC_BADGE_CLASSES } from '../lib/theme'
+import { srcLabel } from '../lib/utils'
 
 // Small colored tag showing a booking's source (Trip.com, Walk-in, etc.).
 // Colors come from SRC_BADGE_CLASSES in src/lib/theme.js — edit there to

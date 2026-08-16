@@ -25,7 +25,7 @@ values or swap to named Tailwind colors — both work.
 stay, Delete, etc. in RoomModal)
 → `src/lib/theme.js` — `PILL_VARIANTS` for colors, `PILL_BASE` for shared
 sizing/shape (padding, rounding, font). Used via `<ActionPill variant="...">`
-— see `src/components/ui/ActionPill.jsx`. Add a new variant name to
+— see `src/components/ActionPill.jsx`. Add a new variant name to
 `PILL_VARIANTS` and it's instantly usable anywhere as
 `<ActionPill variant="yourNewName">`.
 

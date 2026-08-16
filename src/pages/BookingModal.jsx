@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Modal from '../components/Modal'
 import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
+import { INPUT_CLASS } from '../lib/theme'
 import {
   fmtDate,
   sortRoomKeys,
@@ -124,8 +125,7 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
     onClose()
   }
 
-  const inputClass =
-    'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand'
+  const inputClass = INPUT_CLASS
 
   return (
     <Modal

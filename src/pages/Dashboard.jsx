@@ -1,13 +1,12 @@
 import React, { useState, useMemo } from 'react'
 import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
+import { STATUS_CLASSES, SRC_BADGE_CLASSES } from '../lib/theme'
 import {
   fmtDate,
   sortRoomKeys,
   groupByFloor,
   getRoomStatus,
-  STATUS_CLASSES,
-  SRC_BADGE_CLASSES,
   srcShort,
   peso,
   isInRangeInclusive,

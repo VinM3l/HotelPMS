@@ -2,10 +2,9 @@ import React, { useState, useMemo } from 'react'
 import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
 import { useAuth } from '../hooks/useAuth'
+import Badge from '../components/ui/Badge'
 import {
   shortDate,
-  srcLabel,
-  SRC_BADGE_CLASSES,
   peso,
   bookingTotalDue,
   bookingAmountPaid,
@@ -178,11 +177,7 @@ export default function BookingsPage({ currentDate }) {
                 key={b.id}
                 className="bg-white border border-gray-100 rounded-xl p-4 flex items-center gap-3 hover:border-gray-200 transition-colors"
               >
-                <span
-                  className={`text-[10px] font-bold px-2 py-1 rounded flex-shrink-0 ${SRC_BADGE_CLASSES[b.source] || ''}`}
-                >
-                  {srcLabel(b.source)}
-                </span>
+                <Badge source={b.source} />
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-gray-900 truncate flex items-center gap-2">
                     {b.guest}

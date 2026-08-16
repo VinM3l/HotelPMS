@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { useData } from '../hooks/useData'
+import { STATUS_CELL_CLASSES } from '../lib/theme'
 import {
   fmtDate,
   parseDate,
@@ -9,16 +10,7 @@ import {
   srcLabel,
 } from '../lib/utils'
 
-const STATUS_CELL = {
-  occupied: 'bg-[#1a7a4a] text-white',
-  checkout: 'bg-[#1d4ed8] text-white',
-  'invalid-checkout': 'bg-[#dc2626] text-white',
-  extended: 'bg-[#d97706] text-white',
-  'extended-alt': 'bg-[#15803d] text-white',
-  'paid-today': 'bg-[#60a5fa] text-white',
-  maintenance: 'bg-[#374151] text-white',
-  vacant: 'bg-white text-gray-300',
-}
+const STATUS_CELL = STATUS_CELL_CLASSES
 
 function getCellStatus(booking, ds) {
   if (!booking) return 'vacant'

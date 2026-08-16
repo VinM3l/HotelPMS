@@ -3,6 +3,8 @@ import Modal from '../components/Modal'
 import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
 import { useAuth } from '../hooks/useAuth'
+import Badge from '../components/ui/Badge'
+import ActionPill from '../components/ui/ActionPill'
 import {
   fmtDate,
   parseDate,
@@ -14,7 +16,6 @@ import {
   bookingAmountPaid,
   bookingPaymentStatus,
   peso,
-  srcLabel,
   typeLabel,
   calcNights,
   applyDiscount,
@@ -325,21 +326,7 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
                           <div className="text-xs text-gray-400 italic mt-0.5">"{b.notes}"</div>
                         )}
                       </div>
-                      <span
-                        className={`text-[10px] font-bold px-2 py-1 rounded ${
-                          b.source === 'T'
-                            ? 'bg-blue-100 text-blue-700'
-                            : b.source === 'W'
-                              ? 'bg-gray-100 text-gray-600'
-                              : b.source === 'B'
-                                ? 'bg-indigo-100 text-indigo-700'
-                                : b.source === 'AG'
-                                  ? 'bg-red-100 text-red-700'
-                                  : 'bg-amber-100 text-amber-700'
-                        }`}
-                      >
-                        {srcLabel(b.source)}
-                      </span>
+                      <Badge source={b.source} />
                     </div>
 
                     {/* Financials */}
@@ -450,24 +437,14 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
 
                     {/* Actions */}
                     <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => toggleDeposit(b)}
-                        className={`text-xs py-2 px-3 rounded-lg font-medium transition-colors ${
-                          b.key_deposit
-                            ? 'bg-brand/10 text-brand hover:bg-brand/20'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                      >
+                      <ActionPill variant={b.key_deposit ? 'brand' : 'grayDark'} onClick={() => toggleDeposit(b)}>
                         🔑 {b.key_deposit ? 'Deposit paid' : 'Mark deposit paid'}
-                      </button>
+                      </ActionPill>
 
                       {!b.checkin_time && todayStr >= b.checkin && (
-                        <button
-                          onClick={() => markCheckedIn(b)}
-                          className="text-xs py-2 px-3 rounded-lg bg-green-50 text-green-700 font-medium hover:bg-green-100"
-                        >
+                        <ActionPill variant="green" onClick={() => markCheckedIn(b)}>
                           ✅ Mark arrived
-                        </button>
+                        </ActionPill>
                       )}
                       {b.checkin_time && (
                         <div className="text-xs text-gray-400 py-2 px-3 flex items-center gap-1">
@@ -482,63 +459,48 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
                         </div>
                       )}
 
-                      <button
+                      <ActionPill
+                        variant="amber"
                         onClick={() => {
                           setExtendId(b.id)
                           setNewCheckout('')
                         }}
-                        className="text-xs py-2 px-3 rounded-lg bg-amber-50 text-amber-700 font-medium hover:bg-amber-100"
                       >
                         ⟳ Extend stay
-                      </button>
+                      </ActionPill>
 
-                      <button
+                      <ActionPill
+                        variant="blue"
                         onClick={() => {
                           setMoveId(b.id)
                           setMoveTarget('')
                           setMoveNote('')
                         }}
-                        className="text-xs py-2 px-3 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100"
                       >
                         ↔ Move room
-                      </button>
+                      </ActionPill>
 
                       {coActive || invActive ? (
-                        <button
-                          onClick={() => clearCheckoutFlag(b)}
-                          className="text-xs py-2 px-3 rounded-lg bg-gray-50 text-gray-600 font-medium hover:bg-gray-100"
-                        >
+                        <ActionPill variant="gray" onClick={() => clearCheckoutFlag(b)}>
                           ↩ Undo checkout
-                        </button>
+                        </ActionPill>
                       ) : (
                         <>
-                          <button
-                            onClick={() => markCheckedOut(b)}
-                            className="text-xs py-2 px-3 rounded-lg bg-blue-50 text-blue-800 font-medium hover:bg-blue-100"
-                          >
+                          <ActionPill variant="blueDark" onClick={() => markCheckedOut(b)}>
                             🚪 Mark checked out
-                          </button>
-                          <button
-                            onClick={() => markInvalidCheckout(b)}
-                            className="text-xs py-2 px-3 rounded-lg bg-red-50 text-red-700 font-medium hover:bg-red-100"
-                          >
+                          </ActionPill>
+                          <ActionPill variant="redStrong" onClick={() => markInvalidCheckout(b)}>
                             🔴 Invalid checkout
-                          </button>
+                          </ActionPill>
                         </>
                       )}
 
-                      <button
-                        onClick={() => setEditBookingId(b.id)}
-                        className="text-xs py-2 px-3 rounded-lg bg-gray-50 text-gray-700 font-medium hover:bg-gray-100"
-                      >
+                      <ActionPill variant="grayDark" onClick={() => setEditBookingId(b.id)}>
                         ✎ Edit booking
-                      </button>
-                      <button
-                        onClick={() => deleteBookingLocal(b.id)}
-                        className="text-xs py-2 px-3 rounded-lg bg-red-50 text-red-600 font-medium hover:bg-red-100"
-                      >
+                      </ActionPill>
+                      <ActionPill variant="red" onClick={() => deleteBookingLocal(b.id)}>
                         🗑 Delete
-                      </button>
+                      </ActionPill>
                     </div>
                   </div>
                 )
@@ -670,21 +632,7 @@ export default function RoomModal({ roomNumber, currentDate, onClose, onAddBooki
                         key={b.id}
                         className="flex items-center gap-2 py-2 border-b border-gray-100 last:border-0"
                       >
-                        <span
-                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 ${
-                            b.source === 'T'
-                              ? 'bg-blue-100 text-blue-700'
-                              : b.source === 'W'
-                                ? 'bg-gray-100 text-gray-600'
-                                : b.source === 'B'
-                                  ? 'bg-indigo-100 text-indigo-700'
-                                  : b.source === 'AG'
-                                    ? 'bg-red-100 text-red-700'
-                                    : 'bg-amber-100 text-amber-700'
-                          }`}
-                        >
-                          {srcLabel(b.source)}
-                        </span>
+                        <Badge source={b.source} size="sm" />
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium text-gray-900 truncate">
                             {b.guest}

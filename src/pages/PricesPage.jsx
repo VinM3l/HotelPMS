@@ -3,6 +3,7 @@ import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
 import { updatePrice, updateAddon } from '../lib/db'
 import { peso } from '../lib/utils'
+import { INPUT_CLASS_COMPACT } from '../lib/theme'
 
 const SOURCES = [
   { id: 'T', label: 'Trip.com' },
@@ -46,8 +47,7 @@ export default function PricesPage() {
     toast('Add-on rate saved')
   }
 
-  const inputClass =
-    'w-28 border border-gray-200 rounded-lg px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand/30'
+  const inputClass = INPUT_CLASS_COMPACT
 
   return (
     <div className="p-5 space-y-6 max-w-3xl">

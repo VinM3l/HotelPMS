@@ -191,21 +191,5 @@ export const getRoomStatus = (room, booking, date, todayStr) => {
   return 'occupied'
 }
 
-export const STATUS_CLASSES = {
-  occupied: 'bg-[#1a7a4a] border-[#0d3d22] text-white',
-  vacant: 'bg-white border-[#a7d7bc] text-gray-400',
-  checkout: 'bg-[#1d4ed8] border-[#1e3a8a] text-white',
-  'invalid-checkout': 'bg-[#dc2626] border-[#7f1d1d] text-white',
-  extended: 'bg-[#d97706] border-[#92400e] text-white',
-  'extended-alt': 'bg-[#15803d] border-[#14532d] text-white',
-  maintenance: 'bg-[#374151] border-[#1c2128] text-white',
-  'paid-today': 'bg-[#60a5fa] border-[#2563eb] text-white',
-}
-
-export const SRC_BADGE_CLASSES = {
-  T: 'bg-blue-100 text-blue-700',
-  W: 'bg-gray-100 text-gray-600',
-  B: 'bg-indigo-100 text-indigo-700',
-  AG: 'bg-red-100 text-red-700',
-  EX: 'bg-amber-100 text-amber-700',
-}
+// Color/style tokens (STATUS_CLASSES, SRC_BADGE_CLASSES, etc.) now live in
+// src/lib/theme.js — this file stays focused on data/date logic only.

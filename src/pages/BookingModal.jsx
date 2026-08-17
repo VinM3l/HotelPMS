@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Modal from '../components/Modal'
 import { useData } from '../hooks/useData'
 import { useToast } from '../components/Toast'
+import { useAuth } from '../hooks/useAuth'
 import { INPUT_CLASS } from '../lib/theme'
 import {
   fmtDate,
@@ -21,6 +22,7 @@ const SOURCES = ['W', 'T', 'B', 'AG', 'EX']
 export default function BookingModal({ bookingId, preRoom, currentDate, onClose, defaultHotelId }) {
   const { rooms, bookings, prices, addons, reload } = useData()
   const { toast } = useToast()
+  const { user } = useAuth()
 
   const existing = bookings.find((b) => b.id === bookingId) || null
 
@@ -44,6 +46,7 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
   const [notes, setNotes] = useState(existing?.notes || '')
   const [keyDeposit, setKeyDeposit] = useState(existing?.key_deposit || false)
 
+  const [saving, setSaving] = useState(false)
   const roomDef = rooms.find((r) => r.number === room)
   const nights = checkin && checkout && checkout > checkin ? calcNights(checkin, checkout) : 0
   const baseRate = roomDef ? prices[`${roomDef.type}_${source}`] || 0 : 0
@@ -71,6 +74,7 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
       : null
 
   const save = async () => {
+    if (saving) return
     if (!guest.trim()) {
       toast('Enter a guest name')
       return
@@ -79,8 +83,8 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
       toast('Set check-in and check-out')
       return
     }
-    if (checkin > checkout) {
-      toast('Check-out must be after check-in')
+    if (checkin >= checkout) {
+      toast('Check-out must be after check-in (minimum 1 night)')
       return
     }
     if (conflict) {
@@ -88,7 +92,8 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
       return
     }
 
-    const today = fmtDate(currentDate)
+    const realToday = fmtDate(new Date())
+    const autoCheckin = !existing && realToday === checkin
     const payload = {
       id: existing?.id || genId(),
       hotel_id: hotelId,
@@ -115,14 +120,23 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
       checked_out_date: existing?.checked_out_date || null,
       invalid_checkout: existing?.invalid_checkout || false,
       invalid_checkout_date: existing?.invalid_checkout_date || null,
-      checkin_time: existing?.checkin_time || (today === checkin ? nowTimestamp() : null),
+      checkin_time: existing?.checkin_time || (autoCheckin ? nowTimestamp() : null),
+      checked_in_by:
+        existing?.checked_in_by || (autoCheckin ? user?.label || user?.username || null : null),
       checkout_time: existing?.checkout_time || null,
     }
 
-    await upsertBooking(payload)
-    await reload()
-    toast(existing ? 'Booking updated' : 'Booking added')
-    onClose()
+    setSaving(true)
+    try {
+      await upsertBooking(payload)
+      await reload()
+      toast(existing ? 'Booking updated' : 'Booking added')
+      onClose()
+    } catch (err) {
+      console.error(err)
+      toast('❌ Failed to save booking — please try again')
+      setSaving(false)
+    }
   }
 
   const inputClass = INPUT_CLASS
@@ -141,9 +155,10 @@ export default function BookingModal({ bookingId, preRoom, currentDate, onClose,
           </button>
           <button
             onClick={save}
-            className="px-4 py-2 text-sm bg-brand text-white rounded-lg font-semibold hover:bg-brand-dark"
+            disabled={saving}
+            className="px-4 py-2 text-sm bg-brand text-white rounded-lg font-semibold hover:bg-brand-dark disabled:opacity-60"
           >
-            {existing ? 'Save Changes' : 'Save Booking'}
+            {saving ? 'Saving…' : existing ? 'Save Changes' : 'Save Booking'}
           </button>
         </>
       }

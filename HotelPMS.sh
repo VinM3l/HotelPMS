@@ -37,7 +37,4 @@ echo "  ✅ Starting Hotel PMS at http://localhost:5173"
 echo "  Keep this window open. Press Ctrl+C to stop."
 echo ""
 
-# Open browser after delay
-(sleep 2 && (open http://localhost:5173 2>/dev/null || xdg-open http://localhost:5173 2>/dev/null)) &
-
 npm run dev
